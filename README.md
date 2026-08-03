@@ -49,6 +49,7 @@ business-directory/
 └── README.md    # This file
 ```
 Screenshot
+![alt text](image.png)
 
 ## Possible extensions
 
