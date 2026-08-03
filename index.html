@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nearby — Campus Directory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF7EF;
+    --ink:#233024;
+    --ink-soft:#6E7A6C;
+    --line:#DED5BF;
+    --card:#FFFFFF;
+    --green:#3E6B4F;
+    --green-dim:rgba(62,107,79,.12);
+    --terra:#C4693A;
+    --terra-dim:rgba(196,105,58,.14);
+    --gold:#D9A441;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background: var(--bg); color: var(--ink); font-family:'Inter', sans-serif; min-height:100vh; }
+
+  header{ background: var(--ink); color: var(--bg); padding: 30px 24px; }
+  .head-inner{ max-width: 1080px; margin:0 auto; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .brand{ font-family:'Fraunces', serif; font-weight:700; font-size:28px; letter-spacing:-0.01em; }
+  .brand span{ color: var(--gold); }
+  .brand-tag{ font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:.12em; color: rgba(251,247,239,.55); margin-top:2px; }
+  .admin-toggle{
+    margin-left:auto; display:flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+    background: rgba(251,247,239,.08); padding:8px 14px; border-radius:20px; cursor:pointer; user-select:none;
+    border:1px solid rgba(251,247,239,.2);
+  }
+  .admin-toggle .dot{ width:8px; height:8px; border-radius:50%; background:var(--ink-soft); }
+  .admin-toggle.on{ background: var(--terra-dim); border-color: var(--terra); color:#fff; }
+  .admin-toggle.on .dot{ background: var(--terra); }
+
+  main{ max-width: 1080px; margin:0 auto; padding: 26px 24px 70px; }
+
+  .toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 20px; align-items:center; }
+  .toolbar input[type=text]{
+    flex:1; min-width:200px; padding: 11px 14px; border-radius:8px; border:1px solid var(--line);
+    background: var(--card); font-family:'Inter', sans-serif; font-size:14px;
+  }
+  .toolbar input:focus{ outline:2px solid var(--green); outline-offset:1px; }
+  .chip{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+    padding: 8px 14px; border-radius:20px; border:1px solid var(--line); background: var(--card); cursor:pointer;
+    color: var(--ink-soft); white-space:nowrap;
+  }
+  .chip.active{ background: var(--green); color:#fff; border-color: var(--green); }
+  .chip-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+
+  .add-panel{
+    background: var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:22px;
+  }
+  .add-panel h3{ font-family:'Fraunces', serif; font-size:18px; margin-bottom:14px; }
+  .grid-form{ display:grid; grid-template-columns: 1.5fr 1fr 1fr; gap:10px; }
+  .grid-form.full{ grid-template-columns: 1fr; margin-top:10px; }
+  label{ display:block; font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:.07em; color: var(--ink-soft); margin-bottom:5px; }
+  input, select, textarea{
+    width:100%; padding:10px 12px; border-radius:7px; border:1px solid var(--line);
+    background: var(--bg); font-family:'Inter', sans-serif; font-size:14px; color: var(--ink);
+  }
+  textarea{ resize:vertical; min-height:60px; }
+  .btn{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase; letter-spacing:.06em;
+    background: var(--ink); color:var(--bg); border:none; padding:11px 18px; border-radius:7px; cursor:pointer; margin-top:14px;
+  }
+  .btn:hover{ background: var(--green); }
+  .btn.ghost{ background:transparent; border:1px solid var(--line); color:var(--ink); }
+  .btn.ghost:hover{ background: var(--line); }
+  .btn.small{ padding:6px 12px; font-size:10px; margin-top:0; }
+
+  .listing-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:16px; }
+  .listing-card{
+    background: var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; position:relative;
+  }
+  .listing-top{ display:flex; align-items:flex-start; gap:10px; }
+  .listing-top h4{ font-family:'Fraunces', serif; font-size:19px; font-weight:600; }
+  .cat-badge{ font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; letter-spacing:.05em; background: var(--green-dim); color: var(--green); padding:3px 9px; border-radius:20px; display:inline-block; margin-top:6px; }
+  .status-badge{ margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:10px; text-transform:uppercase; padding:4px 10px; border-radius:20px; white-space:nowrap; }
+  .status-badge.open{ background: var(--green-dim); color: var(--green); }
+  .status-badge.closed{ background: var(--terra-dim); color: var(--terra); }
+  .desc{ font-size:13.5px; color: var(--ink-soft); margin-top:10px; line-height:1.5; }
+  .meta-row{ display:flex; gap:16px; margin-top:12px; font-family:'IBM Plex Mono', monospace; font-size:11.5px; color: var(--ink-soft); flex-wrap:wrap; }
+  .stars{ color: var(--gold); font-size:13px; margin-top:10px; }
+  .stars .count{ color: var(--ink-soft); font-family:'IBM Plex Mono', monospace; font-size:11px; margin-left:6px; }
+  .review-box{ margin-top:12px; border-top:1px dashed var(--line); padding-top:12px; }
+  .review-item{ font-size:12.5px; margin-bottom:6px; color: var(--ink); }
+  .review-item .stars-inline{ color: var(--gold); margin-right:6px; }
+  .review-add{ display:flex; gap:6px; margin-top:8px; }
+  .review-add select{ width:70px; }
+  .review-add input{ flex:1; }
+  .fav-btn{
+    position:absolute; top:18px; right:18px; background:none; border:none; font-size:20px; cursor:pointer; color: var(--line);
+  }
+  .fav-btn.active{ color: var(--terra); }
+  .card-actions{ margin-top:14px; text-align:right; }
+  .empty-state{ font-family:'IBM Plex Mono', monospace; font-size:13px; color: var(--ink-soft); padding:40px; text-align:center; border:1px dashed var(--line); border-radius:12px; grid-column: 1/-1; }
+
+  .section-head{ display:flex; align-items:baseline; gap:12px; margin: 30px 0 14px; }
+  .section-head h2{ font-family:'Fraunces', serif; font-size:22px; font-weight:600; }
+  .section-head .n{ font-family:'IBM Plex Mono', monospace; color: var(--terra); font-size:13px; }
+
+  footer{ text-align:center; padding:30px 24px; font-family:'IBM Plex Mono', monospace; font-size:11px; color: var(--ink-soft); }
+
+  @media (max-width:760px){
+    .listing-grid{ grid-template-columns:1fr; }
+    .grid-form{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-inner">
+    <div>
+      <div class="brand">Near<span>by</span></div>
+      <div class="brand-tag">Campus service directory</div>
+    </div>
+    <div class="admin-toggle" id="admin-toggle" onclick="toggleAdmin()">
+      <span class="dot"></span><span id="admin-label">Student view</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="toolbar">
+    <input type="text" id="search-input" placeholder="Search services (e.g. printout, laundry)..." oninput="renderListings()">
+  </div>
+  <div class="chip-row" id="category-chips"></div>
+
+  <div class="add-panel" id="add-panel" style="display:none;">
+    <h3>Add a new listing</h3>
+    <div class="grid-form">
+      <div>
+        <label>Name</label>
+        <input type="text" id="new-name" placeholder="Sunrise Canteen">
+      </div>
+      <div>
+        <label>Category</label>
+        <select id="new-category">
+          <option>Canteen</option>
+          <option>Printout Shop</option>
+          <option>Laundry</option>
+          <option>Stationery</option>
+          <option>Salon</option>
+          <option>Repair Shop</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label>Location</label>
+        <input type="text" id="new-location" placeholder="Block C, Ground Floor">
+      </div>
+    </div>
+    <div class="grid-form">
+      <div>
+        <label>Opens (24h)</label>
+        <input type="time" id="new-open">
+      </div>
+      <div>
+        <label>Closes (24h)</label>
+        <input type="time" id="new-close">
+      </div>
+      <div>
+        <label>Contact (optional)</label>
+        <input type="text" id="new-contact" placeholder="+91 98xxxxxxx">
+      </div>
+    </div>
+    <div class="grid-form full">
+      <div>
+        <label>Description</label>
+        <textarea id="new-desc" placeholder="Short description of the service..."></textarea>
+      </div>
+    </div>
+    <button class="btn" onclick="addListing()">Add listing</button>
+  </div>
+
+  <div class="section-head">
+    <span class="n">◆</span>
+    <h2>Listings</h2>
+  </div>
+  <div class="listing-grid" id="listing-grid"></div>
+
+</main>
+
+<footer>Nearby — local-only directory. All listings, reviews and favorites are stored in your browser (localStorage).</footer>
+
+<script>
+  const load = (k,d) => JSON.parse(localStorage.getItem(k) || JSON.stringify(d));
+  const save = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+
+  const CATEGORIES = ['All','Canteen','Printout Shop','Laundry','Stationery','Salon','Repair Shop','Other'];
+  let activeCategory = 'All';
+  let isAdmin = false;
+
+  const SEED = [
+    { id: uid(), name:'Campus Corner Canteen', category:'Canteen', location:'Block A, Ground Floor', open:'08:00', close:'20:00', contact:'', desc:'Quick snacks, tea, and daily thali meals.', reviews:[{stars:5, text:'Great chai and quick service.'}], fav:false },
+    { id: uid(), name:'Xpress Printout & Xerox', category:'Printout Shop', location:'Near Library Gate', open:'09:00', close:'18:00', contact:'', desc:'Printing, spiral binding, and lamination.', reviews:[{stars:4, text:'Fast printing before submissions.'}], fav:false },
+    { id: uid(), name:'CleanFold Laundry', category:'Laundry', location:'Hostel Block D', open:'07:00', close:'21:00', contact:'', desc:'Wash and fold service, 24-hour turnaround.', reviews:[], fav:false }
+  ];
+
+  function getListings(){
+    let l = load('directory_listings', null);
+    if(l === null){ l = SEED; save('directory_listings', l); }
+    return l;
+  }
+  function setListings(l){ save('directory_listings', l); }
+
+  function toggleAdmin(){
+    isAdmin = !isAdmin;
+    document.getElementById('admin-toggle').className = 'admin-toggle' + (isAdmin ? ' on' : '');
+    document.getElementById('admin-label').textContent = isAdmin ? 'Admin mode' : 'Student view';
+    document.getElementById('add-panel').style.display = isAdmin ? 'block' : 'none';
+    renderListings();
+  }
+
+  function renderChips(){
+    const row = document.getElementById('category-chips');
+    row.innerHTML = '';
+    CATEGORIES.forEach(cat => {
+      const chip = document.createElement('div');
+      chip.className = 'chip' + (cat === activeCategory ? ' active' : '');
+      chip.textContent = cat;
+      chip.onclick = () => { activeCategory = cat; renderChips(); renderListings(); };
+      row.appendChild(chip);
+    });
+  }
+
+  function isOpenNow(open, close){
+    if(!open || !close) return null;
+    const now = new Date();
+    const [oh, om] = open.split(':').map(Number);
+    const [ch, cm] = close.split(':').map(Number);
+    const openMins = oh*60+om, closeMins = ch*60+cm;
+    const nowMins = now.getHours()*60 + now.getMinutes();
+    if(openMins <= closeMins) return nowMins >= openMins && nowMins < closeMins;
+    return nowMins >= openMins || nowMins < closeMins; // overnight case
+  }
+
+  function addListing(){
+    const name = document.getElementById('new-name').value.trim();
+    const category = document.getElementById('new-category').value;
+    const location = document.getElementById('new-location').value.trim();
+    const open = document.getElementById('new-open').value;
+    const close = document.getElementById('new-close').value;
+    const contact = document.getElementById('new-contact').value.trim();
+    const desc = document.getElementById('new-desc').value.trim();
+    if(!name || !location){ alert('Please enter at least a name and location.'); return; }
+    const listings = getListings();
+    listings.push({ id: uid(), name, category, location, open, close, contact, desc, reviews: [], fav:false });
+    setListings(listings);
+    ['new-name','new-location','new-contact','new-desc'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('new-open').value = '';
+    document.getElementById('new-close').value = '';
+    renderListings();
+  }
+
+  function deleteListing(id){
+    if(!confirm('Delete this listing?')) return;
+    setListings(getListings().filter(l => l.id !== id));
+    renderListings();
+  }
+
+  function toggleFav(id){
+    const listings = getListings();
+    const l = listings.find(l => l.id === id);
+    l.fav = !l.fav;
+    setListings(listings);
+    renderListings();
+  }
+
+  function addReview(id, starsSel, textInput){
+    const stars = +starsSel.value;
+    const text = textInput.value.trim();
+    if(!text){ alert('Please write a short review.'); return; }
+    const listings = getListings();
+    const l = listings.find(l => l.id === id);
+    l.reviews.push({ stars, text });
+    setListings(listings);
+    textInput.value = '';
+    renderListings();
+  }
+
+  function renderListings(){
+    const listings = getListings();
+    const query = document.getElementById('search-input').value.toLowerCase().trim();
+    const grid = document.getElementById('listing-grid');
+    grid.innerHTML = '';
+
+    let filtered = listings.filter(l => {
+      const matchesCat = activeCategory === 'All' || l.category === activeCategory;
+      const matchesQuery = !query || l.name.toLowerCase().includes(query) || l.category.toLowerCase().includes(query) || (l.desc||'').toLowerCase().includes(query);
+      return matchesCat && matchesQuery;
+    });
+    filtered.sort((a,b) => (b.fav - a.fav));
+
+    if(filtered.length === 0){
+      grid.innerHTML = '<div class="empty-state">No listings match. Try a different search or category.</div>';
+      return;
+    }
+
+    filtered.forEach(l => {
+      const openNow = isOpenNow(l.open, l.close);
+      const avgStars = l.reviews.length ? (l.reviews.reduce((a,r)=>a+r.stars,0)/l.reviews.length) : 0;
+      const starDisplay = '★'.repeat(Math.round(avgStars)) + '☆'.repeat(5-Math.round(avgStars));
+
+      const card = document.createElement('div');
+      card.className = 'listing-card';
+      card.innerHTML = `
+        <button class="fav-btn ${l.fav?'active':''}" onclick="toggleFav('${l.id}')" title="Bookmark">${l.fav?'♥':'♡'}</button>
+        <div class="listing-top">
+          <div>
+            <h4>${l.name}</h4>
+            <span class="cat-badge">${l.category}</span>
+          </div>
+          ${openNow !== null ? `<span class="status-badge ${openNow?'open':'closed'}">${openNow?'Open now':'Closed'}</span>` : ''}
+        </div>
+        ${l.desc ? `<div class="desc">${l.desc}</div>` : ''}
+        <div class="meta-row">
+          <span>📍 ${l.location}</span>
+          ${l.open && l.close ? `<span>🕒 ${l.open} – ${l.close}</span>` : ''}
+          ${l.contact ? `<span>📞 ${l.contact}</span>` : ''}
+        </div>
+        <div class="stars">${l.reviews.length ? starDisplay : '<span style="color:var(--ink-soft); font-family:IBM Plex Mono, monospace; font-size:11px;">No reviews yet</span>'}${l.reviews.length ? `<span class="count">(${l.reviews.length})</span>` : ''}</div>
+        <div class="review-box">
+          ${l.reviews.slice(-2).map(r => `<div class="review-item"><span class="stars-inline">${'★'.repeat(r.stars)}</span>${r.text}</div>`).join('')}
+          <div class="review-add">
+            <select id="star-sel-${l.id}">
+              <option value="5">5★</option><option value="4">4★</option><option value="3">3★</option><option value="2">2★</option><option value="1">1★</option>
+            </select>
+            <input type="text" id="review-text-${l.id}" placeholder="Add a quick review...">
+            <button class="btn small" onclick="addReview('${l.id}', document.getElementById('star-sel-${l.id}'), document.getElementById('review-text-${l.id}'))">Post</button>
+          </div>
+        </div>
+        ${isAdmin ? `<div class="card-actions"><button class="btn ghost small" onclick="deleteListing('${l.id}')">Delete</button></div>` : ''}
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  renderChips();
+  renderListings();
+  setInterval(renderListings, 60000); // refresh open/closed status every minute
+</script>
+
+</body>
+</html>
