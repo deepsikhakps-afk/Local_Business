@@ -56,5 +56,5 @@ Screenshot
 - Export/import listings as JSON (backup without a database)
 - Map/location pin view for each listing
 - Photo upload for listings (stored as base64 in localStorage)
-- Sort by rating or distance
+- 
 - Multi-language support
