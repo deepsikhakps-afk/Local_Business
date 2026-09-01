@@ -51,7 +51,7 @@ business-directory/
 Screenshot
 ![alt text](image.png)
 
-## Possible 
+## Possible extensions
 
 - Export/import listings as JSON (backup without a database)
 - Map/location pin view for each listing
