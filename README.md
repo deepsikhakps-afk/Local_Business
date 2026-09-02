@@ -53,7 +53,7 @@ Screenshot
 
 ## Possible extensions
 
-- Export/import listings as JSON (backup without a database)
+- Export/import listings as JSON 
 - Map/location pin view for each listing
 - Photo upload for listings (stored as base64 in localStorage)
 - Sort by rating or distance
