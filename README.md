@@ -57,4 +57,4 @@ Screenshot
 - Map/location pin view for each listing
 - Photo upload for listings (stored as base64 in localStorage)
 - Sort by rating or distance
-- Multi-lang
+- Multi-language support
