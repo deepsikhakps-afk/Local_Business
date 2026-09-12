@@ -36,7 +36,7 @@ No installation or server needed.
 ## Tech stack
 
 - HTML5
-- CSS3 (custom properties, no 
+- CSS3 (custom properties, no framework)
 - Vanilla JavaScript (ES6+)
 - Google Fonts (Fraunces, IBM Plex Mono, Inter) — loaded via CDN
 - Browser `localStorage` API for persistence
