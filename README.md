@@ -39,7 +39,7 @@ No installation or server needed.
 - CSS3 (custom properties, no framework)
 - Vanilla JavaScript (ES6+)
 - Google Fonts (Fraunces, IBM Plex Mono, Inter) — loaded via CDN
-- Browser `localStorage` AP
+- Browser `localStorage` API for persistence
 
 ## File structure
 
