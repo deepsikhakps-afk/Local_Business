@@ -45,7 +45,7 @@ No installation or server needed.
 
 ```
 business-directory/
-├── index.html   # Full app: markup, 
+├── index.html   # Full app: markup, styles, and script in one file
 └── README.md    
 ```
 Screenshot
