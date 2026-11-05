@@ -57,4 +57,4 @@ Screenshot
 - Map/location pin view for each listing
 - Photo upload for listings 
 - Sort by rating or distance
-- Multi-language 
+- Multi-language support
